@@ -8,45 +8,46 @@ import TableHead from '@material-ui/core/TableHead'
 import TableBody from '@material-ui/core/TableBody'
 import TableRow from '@material-ui/core/TableRow'
 import TableCell from '@material-ui/core/TableCell'
-import {withStyles} from '@material-ui/core/styles';
-
-const styles = theme => ({
+import {withStyles, recomposeColor} from '@material-ui/core/styles';
+import CircularProgress from '@material-ui/core/CircularProgress';
+const styles = theme => ({ //theme.spacing.unit
   root: {
     width : '100%',
-    margionTop :theme.spacing.unit *3,
+    marginTop :5 * 3,
     overflowX:"auto"
   },
   table:{
     minWidth: 1080
+  },
+  progress: {
+    margin : 10
   }
 })
-const customers = [
-  {
-  'id' : 1,
-  'image' : 'https://placeimg.com/64/64/1',
-  'name' : '홍길동',
-  'birthday' : '961222',
-  'gender' : '남',
-  'job' : '대학생'
-},
-{
-  'id' : 2,
-  'image' : 'https://placeimg.com/64/64/2',
-  'name' : '김현식',
-  'birthday' : '961322',
-  'gender' : '남',
-  'job' : '대학생'
-},
-{
-  'id' : 3,
-  'image' : 'https://placeimg.com/64/64/3',
-  'name' : '김숙식',
-  'birthday' : '961232',
-  'gender' : '여',
-  'job' : '프로그래머'
-}
-]
+
 class App extends Component {
+
+ state = {
+   customers: "",
+   completed : 0
+ }
+
+ componentDidMount() {
+  this.timer = setInterval(this.progress, 20);
+  this.callApi()
+    .then(res => this.setState({customers:res}))
+    .catch(err => console.log(err));
+}
+
+ callApi = async() => {
+   const response = await fetch('/api/customers');
+   const body = await response.json();
+   return body;
+ }
+ 
+ progress = () => {
+   const {completed} = this.state;
+   this.setState({completed : completed >=100 ? 0 : completed + 1});
+ }
   render(){
     const {classes} = this.props;
     return (
@@ -64,8 +65,8 @@ class App extends Component {
                   </TableRow>
               </TableHead>
               <TableBody>
-          {
-            customers.map(c => {
+          { 
+            this.state.customers ? this.state.customers.map(c => {
               return (
                 <Customer 
                   key = {c.id}
@@ -77,8 +78,14 @@ class App extends Component {
                   job = {c.job} >        
                 </Customer>
               )
-            })
-          }
+            }) : 
+            
+            <TableRow>
+              <TableCell colSpan = "6" align="center">
+                <CircularProgress className={classes.progress} variant = "determinate" value = {this.state.completed}></CircularProgress>
+              </TableCell>
+            </TableRow>
+            }
             </TableBody>
           </Table>
         </Paper>
