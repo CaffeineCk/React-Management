@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
+import CustomerAdd from './components/CustomerAdd';
 import './App.css';
 import Paper from '@material-ui/core/Paper'
 import Customer from './components/Customer'
@@ -26,11 +26,23 @@ const styles = theme => ({ //theme.spacing.unit
 
 class App extends Component {
 
- state = {
-   customers: "",
-   completed : 0
- }
+  constructor(props) {
+    super(props);
+    this.state = {
+      customers: "",
+      completed : 0
+    }
+  }
 
+  stateRefresh = () => {
+    this.setState({
+      customers:'',
+      completed:0
+    });
+    this.callApi()
+      .then(res => this.setState({customers:res}))
+      .catch(err => console.log(err));
+  }
  componentDidMount() {
   this.timer = setInterval(this.progress, 20);
   this.callApi()
@@ -89,7 +101,7 @@ class App extends Component {
             </TableBody>
           </Table>
         </Paper>
-        
+        <CustomerAdd stateRefresh = {this.stateRefresh}></CustomerAdd>
       </div>
     );
   }
