@@ -23,7 +23,8 @@ class CustomerAdd extends React.Component {
             birthday:'',
             gender:'',
             job:'',
-            fileName:''
+            fileName:'',
+            open: false
         }
     }
 
